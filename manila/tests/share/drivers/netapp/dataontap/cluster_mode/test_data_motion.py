@@ -53,17 +53,17 @@ class NetAppCDOTDataMotionTestCase(test.TestCase):
         self.config.append_config_values(na_opts.netapp_provisioning_opts)
         self.config.append_config_values(na_opts.netapp_replication_opts)
         CONF.set_override("share_backend_name", self.backend,
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
         CONF.set_override("netapp_transport_type", "https",
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
         CONF.set_override("netapp_login", "fake_user",
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
         CONF.set_override("netapp_password", "fake_password",
-                          group=self.backend, enforce_type=True)
-        CONF.set_override("netapp_server_hostname", "fake_hostname",
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
+        CONF.set_override("netapp_server_hostname", "fake.hostname",
+                          group=self.backend)
         CONF.set_override("netapp_server_port", 8866,
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
 
     def test_get_client_for_backend(self):
         self.mock_object(data_motion, "get_backend_configuration",
@@ -72,7 +72,7 @@ class NetAppCDOTDataMotionTestCase(test.TestCase):
         data_motion.get_client_for_backend(self.backend)
 
         self.mock_cmode_client.assert_called_once_with(
-            hostname='fake_hostname', password='fake_password',
+            hostname='fake.hostname', password='fake_password',
             username='fake_user', transport_type='https', port=8866,
             trace=mock.ANY, vserver=None)
 
@@ -81,19 +81,19 @@ class NetAppCDOTDataMotionTestCase(test.TestCase):
                          mock.Mock(return_value=self.config))
 
         CONF.set_override("netapp_vserver", 'fake_vserver',
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
 
         data_motion.get_client_for_backend(self.backend)
 
         self.mock_cmode_client.assert_called_once_with(
-            hostname='fake_hostname', password='fake_password',
+            hostname='fake.hostname', password='fake_password',
             username='fake_user', transport_type='https', port=8866,
             trace=mock.ANY, vserver='fake_vserver')
 
     def test_get_config_for_backend(self):
         self.mock_object(data_motion, "CONF")
         CONF.set_override("netapp_vserver", 'fake_vserver',
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
         data_motion.CONF.list_all_sections.return_value = [self.backend]
 
         config = data_motion.get_backend_configuration(self.backend)
@@ -103,9 +103,9 @@ class NetAppCDOTDataMotionTestCase(test.TestCase):
     def test_get_config_for_backend_different_backend_name(self):
         self.mock_object(data_motion, "CONF")
         CONF.set_override("netapp_vserver", 'fake_vserver',
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
         CONF.set_override("share_backend_name", "fake_backend_name",
-                          group=self.backend, enforce_type=True)
+                          group=self.backend)
         data_motion.CONF.list_all_sections.return_value = [self.backend]
 
         config = data_motion.get_backend_configuration(self.backend)
