@@ -251,9 +251,13 @@ class CephFSDriver(driver.ExecuteMixin, driver.GaneshaMixin,
         size = self._to_bytes(share['size'])
 
         # Create the CephFS volume
-        cephfs_volume = self.volume_client.create_volume(
-            cephfs_share_path(share), size=size, data_isolated=data_isolated,
-            mode=self._cephfs_volume_mode)
+        try:
+            cephfs_volume = self.volume_client.create_volume(
+                cephfs_share_path(share), size=size, data_isolated=data_isolated,
+                mode=self._cephfs_volume_mode)
+        except TypeError:
+            cephfs_volume = self.volume_client.create_volume(
+                cephfs_share_path(share), size=size, data_isolated=data_isolated)
 
         return self.protocol_helper.get_export_locations(share, cephfs_volume)
 
